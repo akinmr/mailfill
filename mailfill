@@ -3,13 +3,15 @@
 use 5;
 use strict;
 use Text::CSV;
+use Encode;
+use Encode::Guess qw/utf8 cp932/;
 
 open my $fh, '<:encoding(utf8)', 'template.eml' or die $!;
 my $template = join '', (<$fh>);
 close $fh;
 
 my $csv = Text::CSV->new( { binary => 1 } ) or die $!;
-open my $fh, '<:encoding(cp932)', 'data.csv' or die $!;
+open my $fh, '<:encoding(Guess)', 'data.csv' or die $!;
 my $id = 0;
 while (my $row = $csv->getline($fh)) {
   $id++;
@@ -19,7 +21,7 @@ while (my $row = $csv->getline($fh)) {
     my $kwd = chr(ord('A') + $i) x 8;
     $eml =~ s/$kwd/$row->[$i]/g;
   }
-  open my $fhw, '>:encoding(utf8)', "output-${id}.eml" or die $!;
+  open my $fhw, '>:encoding(utf8)', "output-$$-${id}.eml" or die $!;
   print $fhw $eml;
   close $fhw;
 }
